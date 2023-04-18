@@ -1,0 +1,111 @@
+version: "3"
+
+services:
+  database-mysql:
+    container_name: database-mysql
+    image: mysql/mysql-server:5.7
+
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: "runtopia_web_db"
+      TZ: Asia/Seoul
+
+    volumes:
+      - ./db/mysql-init.d:/docker-entrypoint-initdb.d
+
+    ports:
+      - "13306:3306"
+
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    networks:
+      - runtopia_network
+  redis:
+    container_name: redis
+    image: redis:latest
+    command: redis-server --port 6379
+    ports:
+      - "6379:6379"
+    networks:
+      - runtopia_network
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+
+  application:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    container_name: runtopia_app
+    ports:
+      - 8000:8000
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://database-mysql:3306/runtopia_web_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      TZ: Asia/Seoul
+    volumes:
+      - ./files:/root/files
+    depends_on:
+      - database-mysql
+    networks:
+      - runtopia_network
+
+  web:
+    container_name: nginx
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - application
+    networks:
+      - runtopia_network
+  sonarqube:
+    image: sonarqube:lts
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - runtopia_network
+    environment:
+      - sonar.jdbc.url=jdbc:postgresql://sonar-db:5432/sonar
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
+  sonar-db:
+    image: postgres
+    container_name: postgres_sonar
+    ports:
+      - "5432:5432"
+    networks:
+      - runtopia_network
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+networks:
+  runtopia_network:
+volumes:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:
+  postgresql_data:
