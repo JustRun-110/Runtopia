@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - DEAD_ZONE
+  - TARGET
+  - Seal
+  - PolarBear
+  - Fence
+  - Wolf
+  - Bullet
+  - Coin
+  - Ground
+  - Fence
+  - Wolf
+  - Boat
+  - BoatController
+  - BAD_ITEM
+  - GOOD_ITEM
+  - WALL
+  - WolfDoor
+  - GetItem
+  - GameEnd
+  - Cloud
+  - Dolphin
+  - SeaHorse
+  - Squid
+  - Gupi
+  - Turtle
+  - GetItemSquare
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - CharacterController
+  - PuppetMaster
+  - OverUI
+  - Yellow
+  - Green
+  - Fence
+  - WolfDoor
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
